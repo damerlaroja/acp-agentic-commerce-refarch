@@ -12,6 +12,23 @@ from typing import Dict, List, Optional
 API_BASE = "http://localhost:8000"
 
 # Helper functions
+def normalize_checkout_session_for_state(session_data, existing_state=None):
+    """Normalize session data to wrapped shape for Streamlit state."""
+    if not session_data:
+        return None
+
+    if "session" in session_data and isinstance(session_data["session"], dict):
+        return session_data
+
+    normalized = {"session": session_data}
+
+    if existing_state and isinstance(existing_state, dict):
+        for key in ("requires_approval", "approval_risk_factors"):
+            if key in existing_state:
+                normalized[key] = existing_state[key]
+
+    return normalized
+
 def api_call(method: str, endpoint: str, data: Optional[Dict] = None) -> Dict:
     """Make API call to backend."""
     try:
@@ -99,7 +116,10 @@ with st.sidebar:
                 
                 if result.get("success"):
                     st.session_state.workflow_result = result
-                    st.session_state.current_session = result.get("checkout_session")
+                    st.session_state.current_session = normalize_checkout_session_for_state(
+                        result.get("checkout_session"),
+                        st.session_state.current_session,
+                    )
                     
                     # Refresh pending approvals
                     approvals = api_call("GET", "/agent/approvals/pending")
@@ -119,7 +139,10 @@ with st.sidebar:
                 
                 if result.get("success"):
                     st.session_state.workflow_result = result
-                    st.session_state.current_session = result.get("checkout_session")
+                    st.session_state.current_session = normalize_checkout_session_for_state(
+                        result.get("checkout_session"),
+                        st.session_state.current_session,
+                    )
                     
                     # Refresh pending approvals
                     approvals = api_call("GET", "/agent/approvals/pending")
@@ -232,6 +255,21 @@ with col2:
                             )
                             if api_result:
                                 st.success("Purchase approved!")
+                                # Refresh session data after approval
+                                if st.session_state.current_session:
+                                    session_id = st.session_state.current_session["session"]["session_id"]
+                                    try:
+                                        refreshed_response = requests.get(f"{API_BASE}/checkout/session/{session_id}")
+                                        if refreshed_response.status_code == 200:
+                                            refreshed_session = refreshed_response.json()
+                                            st.session_state.current_session = normalize_checkout_session_for_state(
+                                                refreshed_session,
+                                                st.session_state.current_session,
+                                            )
+                                        else:
+                                            st.error("Failed to refresh session data after approval")
+                                    except Exception as e:
+                                        st.error(f"Error refreshing session: {str(e)}")
                                 st.rerun()
                             else:
                                 st.error("Approval failed - please try again")
