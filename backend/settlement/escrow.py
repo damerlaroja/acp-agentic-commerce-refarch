@@ -74,7 +74,7 @@ class MockEscrowService:
             return False
         
         # Mock payment processing - always succeeds in this demo
-        settlement.status = "processing"
+        settlement.status = "completed"
         settlement.completed_at = datetime.now()
         
         # Update the settlement in storage
