@@ -137,6 +137,7 @@ class InMemoryStorage:
                     "session_id": session.session_id,
                     "status": "pending",
                     "total_amount": session.total,
+                    "product_name": session.line_item.product_name if session.line_item else "Unknown Product",
                     "risk_factors": session.approval_risk_factors or [],
                     "created_at": session.created_at,
                     "expires_at": None

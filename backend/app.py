@@ -163,6 +163,7 @@ class CommerceHandler(BaseHTTPRequestHandler):
                         "session_id": approval["session_id"],
                         "status": approval["status"],
                         "total_amount": approval["total_amount"],
+                        "product_name": approval["product_name"],
                         "risk_factors": approval["risk_factors"],
                         "created_at": approval["created_at"].isoformat() if hasattr(approval["created_at"], 'isoformat') else approval["created_at"],
                         "expires_at": approval["expires_at"].isoformat() if approval["expires_at"] and hasattr(approval["expires_at"], 'isoformat') else None

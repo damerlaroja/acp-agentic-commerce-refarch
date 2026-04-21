@@ -205,10 +205,11 @@ with col2:
         st.subheader("Pending Approvals")
         
         for approval in st.session_state.approval_requests:
-            with st.expander(f"Review: {approval['product_name']}", expanded=True):
-                st.write(f"**Product:** {approval['product_name']}")
-                st.write(f"**Total Amount:** {format_currency(approval['total_amount'])}")
-                st.write(f"**Request ID:** {approval['session_id']}")
+            product_name = approval.get('product_name', 'Unknown Product')
+            with st.expander(f"Review: {product_name}", expanded=True):
+                st.write(f"**Product:** {product_name}")
+                st.write(f"**Total Amount:** {format_currency(approval.get('total_amount', 0))}")
+                st.write(f"**Request ID:** {approval.get('session_id', 'Unknown')}")
                 
                 if approval.get('risk_factors'):
                     st.write("**Review required because:**")
@@ -304,7 +305,22 @@ with settlement_col:
     
     if st.session_state.current_session:
         session_id = st.session_state.current_session["session"]["session_id"]
-        settlement = api_call("GET", f"/settlement/{session_id}")
+        # Handle settlement call specially to avoid showing 404 as error
+        try:
+            url = f"{API_BASE}/settlement/{session_id}"
+            response = requests.get(url)
+            if response.status_code == 200:
+                settlement = response.json()
+            elif response.status_code == 404:
+                # Normal pre-settlement state, handle gracefully
+                settlement = None
+            else:
+                # Genuine error
+                st.error(f"API Error: {response.status_code} - {response.text}")
+                settlement = None
+        except Exception as e:
+            st.error(f"Connection Error: {str(e)}")
+            settlement = None
         
         if settlement:
             st.subheader("🏦 Settlement Details")
@@ -322,7 +338,14 @@ with settlement_col:
             if settlement.get("completed_at"):
                 st.write(f"**Completed:** {format_timestamp(settlement['completed_at'])}")
         else:
-            st.info("🏦 No settlement information available")
+            # Handle pre-settlement state gracefully
+            session_status = st.session_state.current_session["session"].get("checkout_status", "unknown")
+            if session_status == "approved":
+                st.info("🏦 Settlement will be created after checkout completion")
+            elif session_status == "completed":
+                st.warning("🏦 Settlement processing...")
+            else:
+                st.info("🏦 Settlement will appear after approval and completion")
     else:
         st.info("👈 Complete a shopping request to view settlement")
 
