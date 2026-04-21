@@ -263,6 +263,7 @@ class CheckoutManager:
         # Update session status
         session.checkout_status = CheckoutStatus.COMPLETED
         session.updated_at = datetime.now()
+        print(f"DEBUG: Updating session {session_id} status to COMPLETED")
         storage.update_checkout_session(session)
         
         # Create audit event
@@ -277,8 +278,10 @@ class CheckoutManager:
         )
         
         # Initiate settlement
+        print(f"DEBUG: Initiating settlement for completed session {session_id}")
         from ..settlement.escrow import settlement_engine
-        settlement_engine.initiate_settlement(session)
+        settlement = settlement_engine.initiate_settlement(session)
+        print(f"DEBUG: Settlement created: {settlement.settlement_id if settlement else 'None'}")
         
         return True
     

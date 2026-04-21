@@ -274,7 +274,7 @@ class CommerceHandler(BaseHTTPRequestHandler):
                 try:
                     success = checkout_manager.complete_checkout_session(session_id)
                     if success:
-                        self._send_json_response({"message": "Checkout completed successfully"})
+                        self._send_json_response({"success": True, "message": "Checkout completed successfully"})
                     else:
                         self._send_error("Failed to complete checkout", 400)
                 except ValueError as e:

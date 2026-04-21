@@ -340,12 +340,26 @@ with settlement_col:
         else:
             # Handle pre-settlement state gracefully
             session_status = st.session_state.current_session["session"].get("checkout_status", "unknown")
+            session_id = st.session_state.current_session["session"]["session_id"]
+            
             if session_status == "approved":
-                st.info("🏦 Settlement will be created after checkout completion")
+                st.info("?? Ready for checkout completion")
+                if st.button("Complete Checkout", key="complete_checkout", help="Complete the approved checkout and create settlement"):
+                    with st.spinner("Completing checkout..."):
+                        print(f"DEBUG: Attempting completion for session {session_id}")
+                        completion_result = api_call("POST", f"/checkout/session/{session_id}/complete")
+                        print(f"DEBUG: Completion result: {completion_result}")
+                        if completion_result and completion_result.get("success"):
+                            st.success("Checkout completed! Settlement created.")
+                            print(f"DEBUG: Completion successful, rerunning UI")
+                            st.rerun()
+                        else:
+                            st.error("Checkout completion failed - please try again")
+                            print(f"DEBUG: Completion failed: {completion_result}")
             elif session_status == "completed":
-                st.warning("🏦 Settlement processing...")
+                st.warning("?? Settlement processing...")
             else:
-                st.info("🏦 Settlement will appear after approval and completion")
+                st.info("?? Settlement will appear after approval and completion")
     else:
         st.info("👈 Complete a shopping request to view settlement")
 
