@@ -1,0 +1,74 @@
+[
+  {
+    "id": "prod_001",
+    "name": "Professional Laptop Bag",
+    "category": "laptop_bag",
+    "price": 89.99,
+    "shipping_eta_days": 4,
+    "inventory": 15,
+    "short_description": "Durable professional laptop bag with padded compartment and multiple pockets"
+  },
+  {
+    "id": "prod_002",
+    "name": "Slim Laptop Sleeve",
+    "category": "laptop_bag",
+    "price": 34.99,
+    "shipping_eta_days": 3,
+    "inventory": 25,
+    "short_description": "Minimalist laptop sleeve with water-resistant exterior"
+  },
+  {
+    "id": "prod_003",
+    "name": "Executive Laptop Briefcase",
+    "category": "laptop_bag",
+    "price": 119.99,
+    "shipping_eta_days": 5,
+    "inventory": 8,
+    "short_description": "Premium leather briefcase with dedicated laptop compartment and business card holder"
+  },
+  {
+    "id": "prod_004",
+    "name": "Tech Backpack Pro",
+    "category": "backpack",
+    "price": 94.99,
+    "shipping_eta_days": 4,
+    "inventory": 12,
+    "short_description": "Tech-focused backpack with USB charging port and laptop protection"
+  },
+  {
+    "id": "prod_005",
+    "name": "Urban Commuter Backpack",
+    "category": "backpack",
+    "price": 67.99,
+    "shipping_eta_days": 3,
+    "inventory": 18,
+    "short_description": "Stylish urban backpack with laptop sleeve and water bottle holder"
+  },
+  {
+    "id": "prod_006",
+    "name": "Laptop Organizer Insert",
+    "category": "accessory",
+    "price": 24.99,
+    "shipping_eta_days": 2,
+    "inventory": 30,
+    "short_description": "Removable organizer insert for bags and backpacks"
+  },
+  {
+    "id": "prod_007",
+    "name": "Premium Laptop Bag",
+    "category": "laptop_bag",
+    "price": 109.99,
+    "shipping_eta_days": 3,
+    "inventory": 6,
+    "short_description": "High-quality laptop bag with premium materials and lifetime warranty"
+  },
+  {
+    "id": "prod_008",
+    "name": "Cable Management Kit",
+    "category": "accessory",
+    "price": 19.99,
+    "shipping_eta_days": 2,
+    "inventory": 40,
+    "short_description": "Complete cable management solution for mobile professionals"
+  }
+]
