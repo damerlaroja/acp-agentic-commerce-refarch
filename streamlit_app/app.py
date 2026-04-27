@@ -400,7 +400,7 @@ with settlement_col:
             session_id = st.session_state.current_session["session"]["session_id"]
             
             if session_status == "approved":
-                st.info("?? Ready for checkout completion")
+                st.info("Ready for checkout completion")
                 if st.button("Complete Checkout", key="complete_checkout", help="Complete the approved checkout and create settlement"):
                     with st.spinner("Completing checkout..."):
                         print(f"DEBUG: Attempting completion for session {session_id}")
@@ -414,9 +414,9 @@ with settlement_col:
                             st.error("Checkout completion failed - please try again")
                             print(f"DEBUG: Completion failed: {completion_result}")
             elif session_status == "completed":
-                st.warning("?? Settlement processing...")
+                st.warning("Settlement processing...")
             else:
-                st.info("?? Settlement will appear after approval and completion")
+                st.info("Settlement will appear after approval and completion")
     else:
         st.info("👈 Complete a shopping request to view settlement")
 
