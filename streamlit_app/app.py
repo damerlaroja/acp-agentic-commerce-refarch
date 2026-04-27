@@ -128,7 +128,7 @@ with st.sidebar:
                 result = api_call(
                     "POST",
                     "/agent/shop",
-                    {"user_request": user_request}
+                    {"user_request": user_request, "max_budget": budget}
                 )
                 
                 if result.get("success"):
@@ -151,7 +151,7 @@ with st.sidebar:
                 result = api_call(
                     "POST",
                     "/agent/shop",
-                    {"user_request": user_request}
+                    {"user_request": user_request, "max_budget": budget}
                 )
                 
                 if result.get("success"):

@@ -300,23 +300,39 @@ class CommerceHandler(BaseHTTPRequestHandler):
                     from backend.merchant.checkout_api import checkout_manager
                     from backend.models.schemas import CheckoutRequest, BuyerIntent
                     
-                    # Get executive briefcase for demo
+                    # Get max_budget from request and select product accordingly
+                    max_budget = data.get('max_budget')
                     products = catalog_manager.get_all_products()
                     demo_product = None
-                    for product in products:
-                        if "executive" in product.name.lower() and "briefcase" in product.name.lower():
-                            demo_product = product
-                            break
+                    budget_match = True
                     
-                    if not demo_product:
-                        demo_product = products[0]  # Fallback to first product
+                    if max_budget and max_budget > 0:
+                        # Find best product under budget
+                        for product in products:
+                            if product.price <= max_budget:
+                                if demo_product is None or product.price > demo_product.price:
+                                    demo_product = product
+                        
+                        # If no product under budget, find closest option
+                        if not demo_product:
+                            demo_product = min(products, key=lambda p: p.price)
+                            budget_match = False
+                    else:
+                        # No budget specified, use executive briefcase for demo
+                        for product in products:
+                            if "executive" in product.name.lower() and "briefcase" in product.name.lower():
+                                demo_product = product
+                                break
+                        
+                        if not demo_product:
+                            demo_product = products[0]  # Fallback to first product
                     
                     # Create mock buyer intent
                     buyer_intent = BuyerIntent(
-                        max_price=150.0,
+                        max_price=max_budget if max_budget and max_budget > 0 else 150.0,
                         category="laptop_bag",
                         max_shipping_days=7,
-                        special_requirements="Demo request"
+                        special_requirements=f"Request: {user_request}"
                     )
                     
                     # Create checkout request
@@ -354,8 +370,13 @@ class CommerceHandler(BaseHTTPRequestHandler):
                             },
                             "approval_required": session.approval_status == "pending"
                         },
-                        "approval_required": session.approval_status == "pending"
+                        "approval_required": session.approval_status == "pending",
+                        "budget_match": budget_match
                     }
+                    
+                    # Add budget warning if no match found
+                    if not budget_match:
+                        response_data["budget_message"] = f"No products found within ${max_budget:.2f} budget; showing closest available option."
                     self._send_json_response(response_data)
                     
                 except Exception as e:
