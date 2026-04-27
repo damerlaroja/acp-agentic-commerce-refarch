@@ -9,7 +9,23 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 # Configuration
-API_BASE = "http://localhost:8000"
+def get_api_base():
+    """Get API base URL with deployment-safe fallbacks."""
+    import os
+    try:
+        # Try Streamlit secrets first (safe access, handles missing secrets file)
+        base = st.secrets.get("API_BASE")
+        if base:
+            return base
+    except Exception:
+        # Secrets file doesn't exist or other secret access error
+        pass
+    # Fall back to environment variable
+    env_base = os.getenv("API_BASE")
+    if env_base:
+        return env_base
+    # Finally fall back to local development default
+    return "http://localhost:8000"
 
 # Helper functions
 def normalize_checkout_session_for_state(session_data, existing_state=None):
@@ -32,7 +48,8 @@ def normalize_checkout_session_for_state(session_data, existing_state=None):
 def api_call(method: str, endpoint: str, data: Optional[Dict] = None) -> Dict:
     """Make API call to backend."""
     try:
-        url = f"{API_BASE}{endpoint}"
+        api_base = get_api_base()  # Dynamic resolution for deployment
+        url = f"{api_base}{endpoint}"
         if method == "GET":
             response = requests.get(url)
         elif method == "POST":
@@ -259,7 +276,8 @@ with col2:
                                 if st.session_state.current_session:
                                     session_id = st.session_state.current_session["session"]["session_id"]
                                     try:
-                                        refreshed_response = requests.get(f"{API_BASE}/checkout/session/{session_id}")
+                                        api_base = get_api_base()  # Dynamic resolution for deployment
+                                        refreshed_response = requests.get(f"{api_base}/checkout/session/{session_id}")
                                         if refreshed_response.status_code == 200:
                                             refreshed_session = refreshed_response.json()
                                             st.session_state.current_session = normalize_checkout_session_for_state(
@@ -345,7 +363,8 @@ with settlement_col:
         session_id = st.session_state.current_session["session"]["session_id"]
         # Handle settlement call specially to avoid showing 404 as error
         try:
-            url = f"{API_BASE}/settlement/{session_id}"
+            api_base = get_api_base()  # Dynamic resolution for deployment
+            url = f"{api_base}/settlement/{session_id}"
             response = requests.get(url)
             if response.status_code == 200:
                 settlement = response.json()

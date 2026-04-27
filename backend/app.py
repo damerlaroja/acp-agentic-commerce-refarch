@@ -416,9 +416,11 @@ def run_server():
         print(f"Failed to load catalog: {e}")
     
     # Run server
-    server_address = ('', 8000)
+    import os
+    port = int(os.getenv("PORT", "8000"))
+    server_address = ('', port)
     httpd = HTTPServer(server_address, CommerceHandler)
-    print("Starting server on http://localhost:8000")
+    print(f"Starting server on port {port}")
     httpd.serve_forever()
 
 
